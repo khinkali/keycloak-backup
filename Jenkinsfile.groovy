@@ -37,7 +37,7 @@ podTemplate(label: 'mypod', containers: [
                 git(
                         url: 'https://bitbucket.org/khinkali/keycloak_backup',
                         credentialsId: 'bitbucket')
-                sh 'rm keycloak_backup/keycloak-export-test.json'
+                sh 'rm ./keycloak_backup/keycloak-export-test.json'
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak_backup/keycloak-export-test.json"
                 withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                     commitAndPushRepo('keycloak_backup')
