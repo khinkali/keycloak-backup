@@ -34,9 +34,9 @@ podTemplate(label: 'mypod', containers: [
                 def podName = podNameLine.substring(0, startIndex)
                 sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
                 sleep 20
-                withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    git url: "https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/khinkali/keycloak_backup"
-                }
+                git(
+                        url: 'https://bitbucket.org/khinkali/keycloak_backup',
+                        credentialsId: 'bitbucket')
                 sh 'rm keycloak-export-test.json'
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak_backup/keycloak-export-test.json"
                 withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
