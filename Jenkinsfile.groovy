@@ -40,6 +40,8 @@ podTemplate(label: 'mypod', containers: [
                 sh 'rm keycloak-export-test.json'
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak-export-test.json"
             }
+            sh 'git config user.email "jenkins@khinkali.ch"'
+            sh 'git config user.name "Jenkins"'
             withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                 commitAndPushRepo()
             }
