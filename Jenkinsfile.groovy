@@ -37,18 +37,18 @@ podTemplate(label: 'mypod', containers: [
                 git(
                         url: 'https://bitbucket.org/khinkali/keycloak_backup',
                         credentialsId: 'bitbucket')
-                sh 'rm ./keycloak_backup/keycloak-export-test.json'
+                sh 'rm keycloak-export-test.json'
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak_backup/keycloak-export-test.json"
                 withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                    commitAndPushRepo('keycloak_backup')
+                    commitAndPushRepo()
                 }
             }
         }
     }
 }
 
-def commitAndPushRepo(String repo) {
-    sh "git -C '${repo}' add --all"
-    sh "git -C '${repo}' diff --quiet && git -C '${repo}' diff --staged --quiet || git -C '${repo}' commit -am 'new_version'"
-    sh "git -C '${repo}' push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/khinkali/${repo}"
+def commitAndPushRepo() {
+    sh "git add --all"
+    sh "git diff --quiet && git diff --staged --quiet || git commit -am 'new_version'"
+    sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/khinkali/keycloak_backup"
 }
