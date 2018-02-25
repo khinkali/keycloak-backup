@@ -65,7 +65,7 @@ podTemplate(label: 'mypod', containers: [
                 git(
                         url: 'https://bitbucket.org/khinkali/keycloak_backup',
                         credentialsId: 'bitbucket')
-                sh 'rm keycloak-export-prod.json'
+                // sh 'rm keycloak-export-prod.json'
                 sh "${kc} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak-export-prod.json"
             }
             sh 'git config user.email "jenkins@khinkali.ch"'
