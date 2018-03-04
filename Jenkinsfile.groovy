@@ -33,7 +33,7 @@ podTemplate(label: 'mypod', containers: [
                 }
                 def podName = podNameLine.substring(0, startIndex)
                 sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
-                sleep 20
+                sleep 60
                 git(
                         url: 'https://bitbucket.org/khinkali/keycloak_backup',
                         credentialsId: 'bitbucket')
@@ -65,7 +65,7 @@ podTemplate(label: 'mypod', containers: [
                 }
                 def podName = podNameLine.substring(0, startIndex)
                 sh "${kc} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
-                sleep 20
+                sleep 60
                 git(
                         url: 'https://bitbucket.org/khinkali/keycloak_backup',
                         credentialsId: 'bitbucket')
