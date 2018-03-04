@@ -40,7 +40,7 @@ podTemplate(label: 'mypod', containers: [
                 try {
                     sh 'rm keycloak-export-test.json'
                 } catch (Exception e) {
-                    echo e
+                    echo 'no keycloak-export-text.json found'
                 }
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak-export-test.json"
             }
