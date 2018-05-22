@@ -50,7 +50,7 @@ podTemplate(label: 'mypod', containers: [
             sh 'git config user.name "Jenkins"'
             sh 'git add --all .'
             sh "git diff --quiet && git diff --staged --quiet || git commit -am 'new_version'"
-            sh 'git pull origin master'
+            sh 'git pull https://bitbucket.org/khinkali/keycloak_backup'
 
             withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/khinkali/jenkins_backup"
