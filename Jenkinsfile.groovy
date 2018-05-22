@@ -34,6 +34,8 @@ podTemplate(label: 'mypod', containers: [
                 def podName = podNameLine.substring(0, startIndex)
                 sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
                 sleep 60
+                sh 'mkdir backup-repo'
+                sh 'cd backup-repo'
                 git(
                         url: 'https://bitbucket.org/khinkali/keycloak_backup',
                         credentialsId: 'bitbucket')
@@ -42,8 +44,6 @@ podTemplate(label: 'mypod', containers: [
                 } catch (Exception e) {
                     echo 'no keycloak-export-text.json found'
                 }
-                sh 'mkdir backup-repo'
-                sh 'cd backup-repo'
                 sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak-export-test.json"
             }
             sh 'git config user.email "jenkins@khinkali.ch"'
@@ -54,6 +54,7 @@ podTemplate(label: 'mypod', containers: [
             withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
                 sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/khinkali/jenkins_backup"
             }
+            sh 'cd ..'
         }
 
     }
