@@ -1,8 +1,7 @@
+@Library('semantic_releasing') _
+
 podTemplate(label: 'mypod', containers: [
-        containerTemplate(name: 'docker', image: 'docker', ttyEnabled: true, command: 'cat'),
-        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'curl', image: 'khinkali/jenkinstemplate:0.0.3', command: 'cat', ttyEnabled: true),
-        containerTemplate(name: 'maven', image: 'maven:3.5.2-jdk-8', command: 'cat', ttyEnabled: true)
+        containerTemplate(name: 'kubectl', image: 'lachlanevenson/k8s-kubectl:v1.8.0', command: 'cat', ttyEnabled: true)
 ],
         volumes: [
                 hostPathVolume(mountPath: '/var/run/docker.sock', hostPath: '/var/run/docker.sock'),
@@ -20,41 +19,14 @@ podTemplate(label: 'mypod', containers: [
         ])
 
         stage('create backup from test') {
-            def kct = 'kubectl --namespace test'
+            def kc = 'kubectl --namespace test'
+            def containerPath = '/opt/jboss/keycloak/standalone/data'
+            def containerName = 'keycloak'
+            def podLabel = 'app=keycloak'
+            def repositoryUrl = 'bitbucket.org/khinkali/keycloak_backup_test'
             container('kubectl') {
-                def keycloakPods = sh(
-                        script: "${kct} get po -l app=keycloak",
-                        returnStdout: true
-                ).trim()
-                def podNameLine = keycloakPods.split('\n')[1]
-                def startIndex = podNameLine.indexOf(' ')
-                if (startIndex == -1) {
-                    return
-                }
-                def podName = podNameLine.substring(0, startIndex)
-                sh "${kct} exec ${podName} -- /opt/jboss/keycloak/bin/standalone.sh -Dkeycloak.migration.action=export -Dkeycloak.migration.provider=singleFile -Dkeycloak.migration.file=keycloak-export.json -Djboss.http.port=5889 -Djboss.https.port=5998 -Djboss.management.http.port=5779 &"
-                sleep 60
-                sh 'mkdir backup-repo'
-                sh 'cd backup-repo'
-                git(
-                        url: 'https://bitbucket.org/khinkali/keycloak_backup',
-                        credentialsId: 'bitbucket')
-                try {
-                    sh 'rm keycloak-export-test.json'
-                } catch (Exception e) {
-                    echo 'no keycloak-export-text.json found'
-                }
-                sh "${kct} cp ${podName}:/opt/jboss/keycloak-export.json ./keycloak-export-test.json"
+                backup(podLabel, containerName, containerPath, repositoryUrl, kc)
             }
-            sh 'git config user.email "jenkins@khinkali.ch"'
-            sh 'git config user.name "Jenkins"'
-            sh 'git add --all .'
-            sh "git diff --quiet && git diff --staged --quiet || git commit -am 'new_version'"
-
-            withCredentials([usernamePassword(credentialsId: 'bitbucket', passwordVariable: 'GIT_PASSWORD', usernameVariable: 'GIT_USERNAME')]) {
-                sh "git push https://${GIT_USERNAME}:${GIT_PASSWORD}@bitbucket.org/khinkali/keycloak_backup"
-            }
-            sh 'cd ..'
         }
 
     }
