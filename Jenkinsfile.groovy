@@ -19,8 +19,7 @@ podTemplate(label: 'mypod', containers: [
         ])
 
         stage('create backup from test') {
-            def now = new Date()
-            currentBuild.displayName = now.format("yyyy-MM-dd HH:mm:ss")
+            currentBuild.displayName = getTimeDateDisplayName()
 
             def kc = 'kubectl --namespace test'
             def containerPath = '/opt/jboss/keycloak/standalone/data'
