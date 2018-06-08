@@ -34,6 +34,11 @@ podTemplate(label: 'mypod', containers: [
 
         }
     } catch (all) {
-        slackSend "Build Failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)"
+        slackSend channel: '#jenkins',
+                color: 'good',
+                message: "Build Failed - ${env.JOB_NAME} ${env.BUILD_NUMBER} (<${env.BUILD_URL}|Open>)",
+                teamDomain: 'khikali',
+                token: 'slack-token'
+        currentBuild.result = 'FAILURE'
     }
 }
